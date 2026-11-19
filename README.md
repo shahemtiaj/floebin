@@ -15,6 +15,10 @@
   macOS 13 Ventura or later · Free
 </p>
 
+<p align="center">
+  <img src="docs/screenshots/hero.png" alt="Floebin's recent downloads list and Settings window" width="900">
+</p>
+
 ---
 
 ## Why Floebin?
@@ -44,6 +48,11 @@ Click the button (or press **⌃⌥D** anywhere) to open your recent downloads.
 - **Drag any row** into an app, or **⌘-click / ⇧-click** several rows and drag them all together.
 - **Filter chips**: All · Video · Audio · Image · Font · Other. They appear automatically when the list has more than one kind of file.
 - **Pin to Top**: right-click a file to keep it in a **Pinned** section above everything else, so your go-to logo, LUT or music bed is always there.
+
+<p align="center">
+  <img src="docs/screenshots/recent-list.png" alt="Recent downloads list with filter chips, thumbnails, media info, source website and browser icons" width="380">
+</p>
+<p align="center"><sub>Thumbnails, file type, duration · resolution · fps, size, the website each file came from and the browser that downloaded it.</sub></p>
 
 ### 👀 Live previews
 - **Hover a video** and it scrubs as you move the mouse across the row, like a timeline.
@@ -90,6 +99,18 @@ Settings → Folders lets you add **Desktop**, your **Screenshots** folder or **
 
 ### ⚙️ Settings window (⌘,)
 Everything in one place, in four tabs: **General** (button, menu bar, launch at login, shortcut, updates), **Button** (size, position, lock), **List** (how many files, audio on hover) and **Folders** (watched folders, project folder, LUT folder).
+
+| General | Button |
+| --- | --- |
+| <img src="docs/screenshots/settings-general.png" alt="Settings: General tab" width="420"> | <img src="docs/screenshots/settings-button.png" alt="Settings: Button tab" width="420"> |
+| **List** | **Folders** |
+| <img src="docs/screenshots/settings-list.png" alt="Settings: List tab" width="420"> | <img src="docs/screenshots/settings-folders.png" alt="Settings: Folders tab" width="420"> |
+
+The ⚙ button in the list also opens a quick settings menu:
+
+<p align="center">
+  <img src="docs/screenshots/quick-settings.png" alt="Quick settings menu from the list header" width="440">
+</p>
 
 ### 🔄 Automatic update checks
 Floebin checks GitHub once a day and tells you when a new version is out. You can also check from the menu bar icon → **Check for Updates…**, or turn checks off in Settings → General.

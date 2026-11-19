@@ -244,7 +244,11 @@ final class PillButton: NSView {
             let field = NSTextField(labelWithString: title)
             field.font = font
             field.textColor = textColor
-            labelSize = field.intrinsicContentSize
+            // Measure generously: a tight label clips its last letter (“All” showed as “Al”).
+            let measured = (title as NSString).size(withAttributes: [.font: font])
+            let intrinsic = field.intrinsicContentSize
+            labelSize = NSSize(width: ceil(max(measured.width, intrinsic.width)) + 4, height: intrinsic.height)
+            field.alignment = .center
             label = field
         }
 
