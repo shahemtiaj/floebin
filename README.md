@@ -1,110 +1,166 @@
-# Floebin
+<p align="center">
+  <img src="Resources/AppIcon-1024.png" width="128" alt="Floebin icon">
+</p>
 
-A small button that floats above every Mac app, full-screen apps included. When a browser download finishes, it appears on the button — drag it straight into Premiere, Resolve, Figma, Slack or anywhere else.
+<h1 align="center">Floebin</h1>
 
-**Version:** 0.9.0 · **Requires:** macOS 13+ · **By** [Shah Emtiaj](https://shahemtiaj.com)
+<p align="center">
+  <b>Your downloads, one drag away.</b><br>
+  A floating button for macOS that catches what you download in the browser so you can drag it straight into Premiere, Resolve, Final Cut, After Effects, Figma, Slack or anything else, even when that app is full-screen.
+</p>
 
-## Build and run
+<p align="center">
+  <a href="https://github.com/shahemtiaj/floebin/releases/latest"><b>⬇︎ Download the latest version</b></a>
+  ·
+  macOS 13 Ventura or later · Free
+</p>
 
-1. Make sure Swift is installed (Xcode, or Command Line Tools: `xcode-select --install`).
-2. In Terminal:
+---
 
-   ```bash
-   cd path/to/Floe   (the folder with Package.swift)
-   bash build.sh
-   open build/Floebin.app
-   ```
+## Why Floebin?
 
-3. The first time, macOS asks: *"Floebin would like to access files in your Downloads folder."* Click **Allow**.
+If you edit video or design, you know the routine: download a clip, sound effect, font or texture, leave your full-screen timeline, dig through Finder, drag it back. Floebin removes that whole trip.
 
-To install for real: `cp -R build/Floebin.app /Applications/`, then turn on **Launch at Login** from the menu bar icon.
+```
+Browser download  →  Floebin's floating button lights up  →  drag it straight into your app
+```
 
-## How to use
+The button floats above every app and every Space, including full-screen apps, so your downloads are always one drag away.
 
-| Action | What happens |
+## Features
+
+### 🫧 The floating button
+- Floats above **every app and every desktop Space**, full-screen apps included.
+- When a download finishes, it shows a **thumbnail of the new file and pulses**. A small spinner shows while something is still downloading.
+- **Drag the button** to drop the file into any app. Floebin hands over a copy, so the original stays safe in Downloads.
+- **Hold ⌥ Option and drag** to move the button anywhere. Its position is remembered and kept on screen.
+- Three sizes (Small, Medium, Large), six quick positions and a **Lock** so it never moves by accident.
+- Fades back when you're not using it, so it never gets in the way.
+
+### 📋 Recent downloads list
+Click the button (or press **⌃⌥D** anywhere) to open your recent downloads.
+- Grouped into **Today**, **Yesterday** and **Earlier**; show 5, 10, 15, 20 or 30 files.
+- Every row shows a thumbnail, file type badge, size, **media info** (duration · resolution · fps for video, duration · sample rate for audio, pixel size for images), the **website it came from** and the **browser icon** (Chrome, Safari, Arc, Brave, Edge, Firefox and more).
+- **Drag any row** into an app, or **⌘-click / ⇧-click** several rows and drag them all together.
+- **Filter chips**: All · Video · Audio · Image · Font · Other. They appear automatically when the list has more than one kind of file.
+- **Pin to Top**: right-click a file to keep it in a **Pinned** section above everything else, so your go-to logo, LUT or music bed is always there.
+
+### 👀 Live previews
+- **Hover a video** and it scrubs as you move the mouse across the row, like a timeline.
+- **Hover audio** and it plays (you can turn this off).
+- **Hover an image** to see it large.
+- **Hold ⌥ Option** for a preview twice as big.
+
+### ⌨️ Keyboard control
+Press **⌃⌥D** from any app. The list opens at your mouse pointer, ready for the keyboard:
+
+| Key | Action |
 | --- | --- |
-| Download a file in any browser | The button lights up with its thumbnail and pulses |
-| Drag the button | Drags the file into the app under your cursor (a copy — the original stays in Downloads) |
-| Click the button | Opens your recent downloads, grouped Today / Yesterday / Earlier. Drag any row into an app; click a row to put it on the button; hover a row for 🔍 Show in Finder; right-click for more |
-| Option-drag the button | Moves it anywhere (position is remembered, kept on screen) |
-| **⌃⌥D** (anywhere) | Opens your recent downloads at the mouse pointer, ready for the keyboard. Change or turn off the shortcut in Settings → General |
-| **Settings… (⌘,)** | A Settings window with General · Button · List · Folders tabs (also: right-click menu, menu bar icon, ⚙ in the list) |
-| Right-click the button | File actions, Recent Downloads, Settings, Hide, Quit |
-| Menu bar icon | About, Show/Hide Floating Button, Recent Downloads, Settings, Launch at Login, Show Tutorial, Quit. A dot appears on it when a new download lands |
-| Menu bar mode (Settings → Click Menu Bar Icon for Recent Downloads) | Click the menu bar icon to open your recent downloads under it, drag the icon to drop your newest file, right-click for the menu. Turn off Settings → Show Floating Button for a menu-bar-only setup |
+| ↑ ↓ | Move between files |
+| Space | Preview |
+| Return | Open |
+| ⌘C | Copy the file (paste it into Finder or an app) |
+| ⌘R | Show in Finder |
+| ⌘⌫ | Remove from the list |
+| ⌘A | Select all |
+| ← → | Change filter |
+| Esc | Close |
 
-## Working with files
+You can switch the shortcut to ⌃⌥Space, ⌥⇧D, ⌃⇧Space or ⌃⌥⌘V, or turn it off.
 
-| Feature | How |
-| --- | --- |
-| **Preview** | Hover a row: videos scrub as you move the mouse across the row, audio plays (Settings → Play Audio on Hover), images show large. **Hold ⌥ Option** for a twice-as-big preview |
-| **Filter** | When the list has more than one kind of file, chips appear on top: All · Video · Audio · Image · Font · Other |
-| **Pin** | Right-click → Pin to Top. Pinned files stay in a Pinned section above everything else |
-| **Keyboard** | ↑↓ move · Space preview · Return open · ⌘C copy file · ⌘R show in Finder · ⌘⌫ remove · ⌘A select all · ←→ change filter · Esc close |
-| **More folders** | Settings → Folders → Add Desktop / Add Screenshots / Add Folder… New files there show up too (Auto-Send only applies to Downloads) |
-| **Several files at once** | ⌘-click or ⇧-click rows, then drag any selected row — they all go together. Right-click acts on the whole selection |
-| **Media info** | Each row shows duration · resolution · fps (video), duration · sample rate (audio), or pixel size (images) |
-| **Source tracking** | Each row shows the website it came from. Right-click → Open Source Page / Copy Source Link (handy for licenses and credits) |
-| **Send to project** | Footer → Set Project Folder. Then hover a row → 📁+, or right-click → Send to “Project”. Files are sorted into Footage / Audio / Images / Fonts / LUTs / Documents. Turn on Auto-Send to file every new download automatically |
-| **Smart actions** (right-click) | Fonts → Install Font · LUTs → Copy to LUT Folder · ZIPs → Unzip · Images → Convert to PNG / JPG |
+### 📁 Send to your project
+- Pick a **project folder** once. Then hover a row and click 📁+, or right-click → **Send to “Project”**.
+- Files are sorted automatically into **Footage, Audio, Images, Fonts, LUTs and Documents**.
+- Turn on **Auto-Send** and every new download goes straight into your project.
+
+### ⚡️ Smart actions (right-click)
+- **Fonts** → Install Font
+- **LUTs** (.cube, .3dl…) → Copy to your LUT folder
+- **ZIP files** → Unzip
+- **Images** → Convert to PNG or JPG
+- Any file → Open Source Page / Copy Source Link (handy for licenses and credits), Copy File, Show in Finder
+
+### 🗂 Watch more than Downloads
+Settings → Folders lets you add **Desktop**, your **Screenshots** folder or **any folder**. New files there show up in Floebin too.
+
+### 🧭 Menu bar mode
+- Floebin also lives in the menu bar. A dot appears when a new download lands.
+- Optionally **click the menu bar icon to open recent downloads**, and **drag the menu bar icon** to drop your newest file.
+- Hide the floating button completely for a clean, menu-bar-only setup.
+
+### ⚙️ Settings window (⌘,)
+Everything in one place, in four tabs: **General** (button, menu bar, launch at login, shortcut, updates), **Button** (size, position, lock), **List** (how many files, audio on hover) and **Folders** (watched folders, project folder, LUT folder).
+
+### 🔄 Automatic update checks
+Floebin checks GitHub once a day and tells you when a new version is out. You can also check from the menu bar icon → **Check for Updates…**, or turn checks off in Settings → General.
+
+### 👋 Friendly from the first launch
+- A short, skippable **tour** shows new users the basics. Replay it any time from the menu.
+- **VoiceOver** labels on the button, menu bar icon, rows and controls.
+- No Dock icon, no clutter: Floebin stays out of your way.
+
+## Install
+
+1. Download **Floebin-x.y.z.dmg** from the [latest release](https://github.com/shahemtiaj/floebin/releases/latest).
+2. Open it and drag **Floebin** into **Applications**.
+3. First launch: **right-click Floebin → Open → Open**. Floebin isn't notarized by Apple yet, so macOS asks once.
+4. Click **Allow** when macOS asks for access to your Downloads folder.
+5. Optional: menu bar icon → **Launch at Login**.
+
+## Build from source
+
+Requires Swift 5.9+ (Xcode or the Command Line Tools: `xcode-select --install`).
+
+```bash
+git clone https://github.com/shahemtiaj/floebin.git
+cd floebin
+bash build.sh
+open build/Floebin.app
+```
+
+`bash release.sh` builds the app and a DMG in `build/`.
+
+### Signing
+
+`build.sh` picks the best signature it can find:
+
+1. **Developer ID Application** (paid Apple Developer account): needed for notarized releases.
+2. **Floebin Local**: a free certificate you make once. macOS then remembers Floebin's Downloads permission across rebuilds.
+3. **Ad-hoc**: works on this Mac only; macOS may ask for Downloads access again after each rebuild.
+
+To make **Floebin Local** (one minute): open **Keychain Access** → menu **Keychain Access → Certificate Assistant → Create a Certificate…** → Name `Floebin Local`, Identity Type *Self Signed Root*, Certificate Type *Code Signing* → Create. Then run `bash build.sh` again.
+
+## Releasing a new version
+
+1. Bump `CFBundleShortVersionString` (e.g. `0.9.1`) and `CFBundleVersion` in `Resources/Info.plist`.
+2. Run `bash release.sh`. You get `build/Floebin-0.9.1.dmg` (signed and notarized if a Developer ID is set up; see the notes in `release.sh`).
+3. Publish a GitHub release tagged `v0.9.1` with the DMG attached.
+
+Every installed copy of Floebin finds it through its update check.
 
 ## Project layout
 
 ```
-Package.swift                     Swift package (no Xcode project needed)
-Sources/Floebin/FloebinApp.swift        Entry point (menu-bar-only app)
-Sources/Floebin/AppDelegate.swift    Floating panel, menus, recent list, launch at login
-Sources/Floebin/DownloadWatcher.swift  Watches ~/Downloads, ignores unfinished files
-Sources/Floebin/FloeButtonView.swift   The round button: thumbnail, drag-out, pulse
-Sources/Floebin/RecentListController.swift  The recent-downloads list and its draggable rows
-Sources/Floebin/Thumbnails.swift       Quick Look thumbnails with a cache
-Sources/Floebin/AboutController.swift    About Floebin — version and credits
-Sources/Floebin/TutorialController.swift  First-launch step-by-step tour (skippable)
-Sources/Floebin/StatusIconView.swift  Menu bar icon: click for recents, drag the newest file
-Sources/Floebin/Styles.swift           Floebin mark, file-type badges, pill buttons, floating panels
-Sources/Floebin/PreviewController.swift  Hover preview card (video scrub, audio play)
-Sources/Floebin/MediaInfo.swift        Duration / resolution / fps / sample rate + download source
-Sources/Floebin/FileActions.swift      File menus, send to project, install font, unzip, convert
-Sources/Floebin/SettingsWindowController.swift  The Settings window (⌘,)
-Sources/Floebin/HotKey.swift           Global keyboard shortcut
-Sources/Floebin/UpdateChecker.swift    Checks GitHub Releases for a newer version
-Resources/Info.plist              App bundle settings (LSUIElement = no Dock icon)
-Resources/AppIcon.iconset/        App icon PNGs (build.sh turns them into AppIcon.icns)
-Resources/AppIcon.svg             Icon source artwork
-build.sh                          Builds and signs build/Floebin.app
-release.sh                        Signed + notarized Floebin.dmg for sharing (needs Developer ID)
+Package.swift                         Swift package (no Xcode project needed)
+Sources/Floebin/
+  FloebinApp.swift                    Entry point (menu bar app, no Dock icon)
+  AppDelegate.swift                   Floating panel, menus, watched folders, pins, settings glue
+  DownloadWatcher.swift               Watches folders, ignores unfinished downloads
+  FloeButtonView.swift                The round button: thumbnail, drag-out, pulse, spinner
+  RecentListController.swift          Recent list: filters, pins, keyboard control, rows
+  PreviewController.swift             Hover preview (video scrub, audio, ⌥ for large)
+  MediaInfo.swift                     Duration / resolution / fps, source website and browser
+  FileActions.swift                   File menus, send to project, fonts, LUTs, unzip, convert
+  SettingsWindowController.swift      Settings window (⌘,)
+  HotKey.swift                        Global keyboard shortcut
+  UpdateChecker.swift                 GitHub release update checks
+  StatusIconView.swift                Menu bar icon: click for recents, drag the newest file
+  TutorialController.swift            First-launch tour
+  AboutController.swift               About Floebin and credits
+  Styles.swift / Thumbnails.swift     Shared UI pieces and Quick Look thumbnails
+Resources/                            Info.plist and the app icon
+build.sh / release.sh                 Build the app / build a DMG
 ```
-
-Open it in Xcode with `open Package.swift` if you prefer.
-
-## Signing
-
-`build.sh` picks the best signature it can find:
-
-1. **Developer ID Application** (paid Apple Developer account) — required to share Floebin with other people.
-2. **Floebin Local** — a free certificate you make once. macOS then remembers Floebin's Downloads permission across rebuilds.
-3. **Ad-hoc** — works on this Mac only; macOS may ask for Downloads access again after each rebuild.
-
-To make **Floebin Local** (one time, 1 minute): open **Keychain Access** → menu **Keychain Access → Certificate Assistant → Create a Certificate…** → Name: `Floebin Local`, Identity Type: *Self Signed Root*, Certificate Type: *Code Signing* → Create. Then run `bash build.sh` again.
-
-## Sharing and updates
-
-1. With a Developer ID set up (see the notes at the top of `release.sh`), run `bash release.sh`. You get `build/Floebin-0.9.0.dmg`, signed, notarized and stapled, so it opens on any Mac without warnings.
-2. Create a GitHub release at `github.com/shahemtiaj/floebin` with the tag `v0.9.0` and attach the DMG.
-3. Every copy of Floebin checks once a day (Settings → General → Check for updates automatically) and offers the new version. You can also check from the menu bar icon → Check for Updates….
-
-Remember to bump `CFBundleShortVersionString` and `CFBundleVersion` in `Resources/Info.plist` before each release.
-
-## Known limits
-
-- Not sandboxed, so this build isn't ready for the Mac App Store yet.
-- Updates open the download page; they don't install themselves yet.
-
-## Next
-
-- Search in the list
-- Clean up stock-site file names
-- Drop files onto Floebin (two-way shelf)
 
 ## Credits
 
