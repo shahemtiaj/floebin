@@ -152,7 +152,7 @@ The first time you open Floebin, macOS shows this:
 ### Option 1: System Settings (no Terminal)
 
 1. Try to open Floebin once and click **Done** on the warning (picture above, ①).
-2. Open **System Settings** (Apple menu  → System Settings) and click **Privacy & Security** in the sidebar (②).
+2. Open **System Settings** (Apple menu → System Settings) and click **Privacy & Security** in the sidebar (②).
 3. Scroll down to the **Security** section (③). Right under *Allow applications from* you'll see *“Floebin” was blocked to protect your Mac.* Click **Open Anyway**.
 4. A final dialog appears: click **Open Anyway** again and enter your Mac password (or use Touch ID).
 
