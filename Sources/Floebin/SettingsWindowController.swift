@@ -32,6 +32,7 @@ protocol SettingsHost: AnyObject {
     func chooseLUTFolder()
     func checkForUpdatesNow()
     func showTutorial()
+    func showAbout()
 }
 
 /// A real Settings window (⌘,) with tabs: General · Button · List · Folders.
@@ -123,7 +124,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
 
         pane.section("Updates")
         pane.checkbox("Check for updates automatically", on: host.automaticUpdateChecks, action: #selector(toggleUpdates(_:)))
-        pane.buttons([("Check Now", #selector(checkNow)), ("Show Tutorial", #selector(showTutorial))])
+        pane.buttons([("Check Now", #selector(checkNow)), ("Show Tutorial", #selector(showTutorial)), ("About Floebin", #selector(showAboutPage))])
 
         return pane.finish()
     }
@@ -207,6 +208,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     @objc private func hotKeyChanged(_ sender: NSPopUpButton) { host?.hotKeyPreset = sender.indexOfSelectedItem; rebuild() }
     @objc private func checkNow() { host?.checkForUpdatesNow() }
     @objc private func showTutorial() { window?.close(); host?.showTutorial() }
+    @objc private func showAboutPage() { window?.close(); host?.showAbout() }
 
     @objc private func sizeChanged(_ sender: NSSegmentedControl) {
         let index = sender.selectedSegment

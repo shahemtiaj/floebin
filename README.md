@@ -119,6 +119,7 @@ Floebin checks GitHub once a day and tells you when a new version is out. You ca
 - A short, skippable **tour** shows new users the basics. Replay it any time from the menu.
 - **VoiceOver** labels on the button, menu bar icon, rows and controls.
 - No Dock icon, no clutter: Floebin stays out of your way.
+- **About Floebin** (credits and links) from the menu bar icon's right-click menu, the floating button's right-click menu, or Settings → General.
 
 ## Install
 

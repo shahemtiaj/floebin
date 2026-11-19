@@ -396,7 +396,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         tutorial.start(anchor: cardAnchor)
     }
 
-    @objc private func showAbout() {
+    @objc func showAbout() {
         list.hide()
         tutorial.hide()
         about.show(near: cardAnchor)
