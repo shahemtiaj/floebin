@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Can't open Floebin the first time?
+    url: https://github.com/shahemtiaj/floebin#opening-floebin-the-first-time
+    about: macOS blocks apps that aren't notarized. Here's how to open Floebin once.

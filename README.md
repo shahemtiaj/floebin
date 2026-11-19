@@ -10,6 +10,14 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/shahemtiaj/floebin/releases/latest"><img src="https://img.shields.io/github/v/release/shahemtiaj/floebin?label=version&color=2f81f7" alt="Latest version"></a>
+  <img src="https://img.shields.io/badge/macOS-13%2B-black?logo=apple" alt="macOS 13 or later">
+  <img src="https://img.shields.io/badge/Swift-5.9-F05138?logo=swift&logoColor=white" alt="Swift 5.9">
+  <img src="https://img.shields.io/badge/price-free-2ea44f" alt="Free">
+  <a href="https://github.com/shahemtiaj/floebin/releases"><img src="https://img.shields.io/github/downloads/shahemtiaj/floebin/total?color=8957e5" alt="Downloads"></a>
+</p>
+
+<p align="center">
   <a href="https://github.com/shahemtiaj/floebin/releases/latest"><b>⬇︎ Download the latest version</b></a>
   ·
   macOS 13 Ventura or later · Free
@@ -212,6 +220,14 @@ To make **Floebin Local** (one minute): open **Keychain Access** → menu **Keyc
 Every installed copy of Floebin finds it within a day and offers **Install & Restart**.
 
 > With ad-hoc signing, macOS may ask for Downloads access once more after an update. A "Floebin Local" or Developer ID signature avoids that.
+
+## What's changed
+
+See [CHANGELOG.md](CHANGELOG.md) for every version, or the [Releases](https://github.com/shahemtiaj/floebin/releases) page.
+
+## Feedback
+
+Found a bug or have an idea? [Open an issue](https://github.com/shahemtiaj/floebin/issues/new/choose).
 
 ## Project layout
 
