@@ -98,7 +98,7 @@ Settings → Folders lets you add **Desktop**, your **Screenshots** folder or **
 - Hide the floating button completely for a clean, menu-bar-only setup.
 
 ### ⚙️ Settings window (⌘,)
-Everything in one place, in four tabs: **General** (button, menu bar, launch at login, shortcut, updates), **Button** (size, position, lock), **List** (how many files, audio on hover) and **Folders** (watched folders, project folder, LUT folder).
+Everything in one place, in five tabs: **General** (button, menu bar, launch at login, shortcut, updates), **Button** (size, position, lock), **List** (how many files, audio on hover), **Folders** (watched folders, project folder, LUT folder) and **About** (version and credits).
 
 | General | Button |
 | --- | --- |
@@ -112,14 +112,19 @@ The ⚙ button in the list also opens a quick settings menu:
   <img src="docs/screenshots/quick-settings.png" alt="Quick settings menu from the list header" width="440">
 </p>
 
-### 🔄 Automatic update checks
-Floebin checks GitHub once a day and tells you when a new version is out. You can also check from the menu bar icon → **Check for Updates…**, or turn checks off in Settings → General.
+### 🔄 One-click updates
+When a new version is out, a small **update card** pops up (even over full-screen apps) with what's new and three choices:
+- **Install & Restart**: Floebin downloads the new version, replaces itself and reopens. Nothing to drag, nothing to delete.
+- **Later**: you'll be reminded at the next check.
+- **Skip This Version**: no more reminders for that version.
+
+Floebin checks about once a day while it's running. You can also check any time from the menu bar icon → **Check for Updates…** or **Settings → General → Check Now**, and turn automatic checks off there.
 
 ### 👋 Friendly from the first launch
 - A short, skippable **tour** shows new users the basics. Replay it any time from the menu.
 - **VoiceOver** labels on the button, menu bar icon, rows and controls.
 - No Dock icon, no clutter: Floebin stays out of your way.
-- **About Floebin** (credits and links) from the menu bar icon's right-click menu, the floating button's right-click menu, or Settings → General.
+- **About Floebin** (credits and links) from Settings → About, the menu bar icon's right-click menu, or the floating button's right-click menu.
 
 ## Install
 
@@ -154,11 +159,13 @@ To make **Floebin Local** (one minute): open **Keychain Access** → menu **Keyc
 
 ## Releasing a new version
 
-1. Bump `CFBundleShortVersionString` (e.g. `0.9.1`) and `CFBundleVersion` in `Resources/Info.plist`.
-2. Run `bash release.sh`. You get `build/Floebin-0.9.1.dmg` (signed and notarized if a Developer ID is set up; see the notes in `release.sh`).
-3. Publish a GitHub release tagged `v0.9.1` with the DMG attached.
+1. Bump `CFBundleShortVersionString` (e.g. `1.0.1`) and `CFBundleVersion` in `Resources/Info.plist`.
+2. Run `bash release.sh`. You get `build/Floebin-1.0.1.dmg` (signed and notarized if a Developer ID is set up; see the notes in `release.sh`).
+3. Publish a GitHub release tagged `v1.0.1` with the DMG attached. The release text becomes the "What's new" in the update card.
 
-Every installed copy of Floebin finds it through its update check.
+Every installed copy of Floebin finds it within a day and offers **Install & Restart**.
+
+> With ad-hoc signing, macOS may ask for Downloads access once more after an update. A "Floebin Local" or Developer ID signature avoids that.
 
 ## Project layout
 
@@ -175,7 +182,8 @@ Sources/Floebin/
   FileActions.swift                   File menus, send to project, fonts, LUTs, unzip, convert
   SettingsWindowController.swift      Settings window (⌘,)
   HotKey.swift                        Global keyboard shortcut
-  UpdateChecker.swift                 GitHub release update checks
+  UpdateChecker.swift                 GitHub release checks, download and install
+  UpdatePopupController.swift         The update card (Install & Restart · Later · Skip)
   StatusIconView.swift                Menu bar icon: click for recents, drag the newest file
   TutorialController.swift            First-launch tour
   AboutController.swift               About Floebin and credits

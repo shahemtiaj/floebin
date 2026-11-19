@@ -49,7 +49,7 @@ final class DownloadWatcher {
         }
 
         // Everything already in the folder at launch is "old".
-        seen = Set(files.map(\.path))
+        seen = Set(files.map { $0.path })
 
         let fd = open(folder.path, O_EVTONLY)
         guard fd >= 0 else {
@@ -83,13 +83,24 @@ final class DownloadWatcher {
     }
 
     /// The newest finished files already in the folder, newest first.
+    /// Fast even with thousands of files: dates are read once, newest first,
+    /// and checking stops as soon as there are enough.
     func latestFiles(limit: Int, excluding: (URL) -> Bool = { _ in false }) -> [URL] {
-        guard let files = try? listFiles() else { return [] }
-        let names = Set(files.map(\.lastPathComponent))
-        let ready = files
-            .filter { isReady($0, siblingNames: names) && !excluding($0) }
-            .sorted { addedDate($0) > addedDate($1) }
-        return Array(ready.prefix(limit))
+        guard limit > 0, let files = try? listFiles() else { return [] }
+        let names = Set(files.map { $0.lastPathComponent })
+        let dated = files
+            .map { (url: $0, date: addedDate($0)) }
+            .sorted { $0.date > $1.date }
+        var result: [URL] = []
+        for entry in dated {
+            if isReady(entry.url, siblingNames: names) && !excluding(entry.url) {
+                result.append(entry.url)
+                if result.count >= limit {
+                    break
+                }
+            }
+        }
+        return result
     }
 
     // MARK: - Scanning
@@ -108,9 +119,9 @@ final class DownloadWatcher {
         guard let files = try? listFiles() else { return }
 
         // Forget files that were deleted, so a re-download with the same name counts as new.
-        seen.formIntersection(Set(files.map(\.path)))
+        seen.formIntersection(Set(files.map { $0.path }))
 
-        let names = Set(files.map(\.lastPathComponent))
+        let names = Set(files.map { $0.lastPathComponent })
         let now = Date()
         var stillWriting = false
         let fresh = files
@@ -124,7 +135,9 @@ final class DownloadWatcher {
                 }
                 return true
             }
-            .sorted { addedDate($0) < addedDate($1) }
+            .map { (url: $0, date: addedDate($0)) }
+            .sorted { $0.date < $1.date }
+            .map { $0.url }
 
         for url in fresh {
             seen.insert(url.path)

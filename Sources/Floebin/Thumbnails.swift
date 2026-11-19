@@ -5,11 +5,18 @@ import QuickLookThumbnailing
 /// Calls `apply` immediately with a placeholder, then again with the real thumbnail if there is one.
 @MainActor
 enum Thumbnails {
-    private static let cache = NSCache<NSString, NSImage>()
+    private static let cache: NSCache<NSString, NSImage> = {
+        let cache = NSCache<NSString, NSImage>()
+        cache.countLimit = 300
+        return cache
+    }()
 
     static func load(_ url: URL, side: CGFloat, scale: CGFloat, placeholder: NSImage? = nil, apply: @escaping (NSImage) -> Void) {
         // Cache per size, so the small row thumbnail never stands in for the big preview.
-        let key = "\(url.path)|\(Int(side))" as NSString
+        // …and per file version, so a re-download with the same name gets a fresh thumbnail.
+        let modified = (try? url.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate
+        let stamp = Int(modified?.timeIntervalSinceReferenceDate ?? 0)
+        let key = "\(url.path)|\(Int(side))|\(stamp)" as NSString
         if let cached = Thumbnails.cache.object(forKey: key) {
             apply(cached)
             return

@@ -242,6 +242,7 @@ final class FileActionCenter: NSObject {
                                      message: "Choose the folder your editing app loads LUTs from.")
         else { return }
         UserDefaults.standard.set(url.path, forKey: Self.lutFolderKey)
+        onProjectChanged?()
     }
 
     // MARK: Menus
@@ -385,12 +386,14 @@ final class FileActionCenter: NSObject {
 
         case .copyPath:
             NSPasteboard.general.clearContents()
-            NSPasteboard.general.setString(urls.map(\.path).joined(separator: "\n"), forType: .string)
+            NSPasteboard.general.setString(urls.map { $0.path }.joined(separator: "\n"), forType: .string)
+            onSuccess?()
 
         case .copyFiles:
             // Paste into Finder, Slack, Mail… as real files
             NSPasteboard.general.clearContents()
             NSPasteboard.general.writeObjects(urls.map { $0 as NSURL })
+            onSuccess?()
 
         case .pin:
             onPin?(urls, true)
@@ -437,6 +440,7 @@ final class FileActionCenter: NSObject {
             if let page = DownloadSource.pageURL(for: urls[0]) {
                 NSPasteboard.general.clearContents()
                 NSPasteboard.general.setString(page.absoluteString, forType: .string)
+                onSuccess?()
             }
 
         case .remove:
@@ -523,10 +527,12 @@ final class FileActionCenter: NSObject {
 
     @objc private func toggleSort() {
         UserDefaults.standard.set(!sortsByType, forKey: Self.sortKey)
+        onProjectChanged?()
     }
 
     @objc private func toggleAutoSend() {
         UserDefaults.standard.set(!autoSends, forKey: Self.autoSendKey)
+        onProjectChanged?()
     }
 
     @objc private func clearProject() {

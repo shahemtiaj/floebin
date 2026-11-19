@@ -480,17 +480,31 @@ final class RecentListController: NSObject {
 
         // ── Filter chips ───────────────────────────────────────
         if !chips.isEmpty {
+            // Every chip must fit on one line: tighten the padding and gaps until they do.
+            let available = size.width - inset * 2 + 4
+            var buttons: [PillButton] = []
+            var gap: CGFloat = 6
+            for (padding, spacing) in [(CGFloat(11), CGFloat(6)), (9, 5), (7, 4), (5, 3)] {
+                buttons = chips.map { chip in
+                    PillButton(title: chip.title, symbol: nil, style: chip == filter ? .prominent : .normal,
+                               height: 24, padding: padding)
+                }
+                gap = spacing
+                let total = buttons.reduce(CGFloat(0)) { $0 + $1.frame.width } + gap * CGFloat(buttons.count - 1)
+                if total <= available {
+                    break
+                }
+            }
             var x = inset - 2
-            for chip in chips {
-                let button = PillButton(title: chip.title, symbol: nil, style: chip == filter ? .prominent : .normal, height: 24)
-                guard x + button.frame.width <= size.width - inset else { break }
+            for (chip, button) in zip(chips, buttons) {
                 button.frame.origin = NSPoint(x: x, y: headerHeight + 6)
                 button.setAccessibilityLabel("Show \(chip.title)")
+                button.toolTip = chip == .all ? "Show everything" : "Show only \(chip.title.lowercased())"
                 button.onPress = { [weak self] in
                     self?.setFilter(chip)
                 }
                 content.addSubview(button)
-                x += button.frame.width + 6
+                x += button.frame.width + gap
             }
         }
 

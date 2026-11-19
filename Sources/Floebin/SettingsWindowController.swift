@@ -32,10 +32,12 @@ protocol SettingsHost: AnyObject {
     func chooseLUTFolder()
     func checkForUpdatesNow()
     func showTutorial()
-    func showAbout()
+    /// A newer version that's ready to install (nil when up to date).
+    var availableUpdateVersion: String? { get }
+    func showAvailableUpdate()
 }
 
-/// A real Settings window (⌘,) with tabs: General · Button · List · Folders.
+/// A real Settings window (⌘,) with tabs: General · Button · List · Folders · About.
 /// Built from code; it re-reads everything each time it opens or something changes.
 @MainActor
 final class SettingsWindowController: NSObject, NSWindowDelegate {
@@ -47,6 +49,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     private let paneWidth: CGFloat = 540
     private let labelWidth: CGFloat = 170
     private var folderPaths: [String] = []
+    private var rebuildScheduled = false
 
     static let spots = ["Top Left", "Top Right", "Middle Left", "Middle Right", "Bottom Left", "Bottom Right"]
     static let sizes: [(title: String, points: Int)] = [("Small", 44), ("Medium", 54), ("Large", 66)]
@@ -70,6 +73,25 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         window?.makeKeyAndOrderFront(nil)
     }
 
+    /// Call after a setting changes somewhere else (a menu, the list…): updates the window if it's open.
+    func refreshIfOpen() {
+        guard window?.isVisible == true else { return }
+        scheduleRebuild()
+    }
+
+    /// Rebuilds on the next run-loop turn, once, even if several things change at once —
+    /// and never while a control in the old view is still handling its click.
+    private func scheduleRebuild() {
+        guard !rebuildScheduled else { return }
+        rebuildScheduled = true
+        DispatchQueue.main.async { [weak self] in
+            MainActor.assumeIsolated {
+                self?.rebuildScheduled = false
+                self?.rebuild()
+            }
+        }
+    }
+
     /// Re-reads every value (call after anything changes).
     func rebuild() {
         guard let window, host != nil else { return }
@@ -83,7 +105,8 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
             ("General", "gearshape", generalPane()),
             ("Button", "circle.circle", buttonPane()),
             ("List", "list.bullet.rectangle", listPane()),
-            ("Folders", "folder", foldersPane())
+            ("Folders", "folder", foldersPane()),
+            ("About", "info.circle", aboutPane())
         ]
         for (title, symbol, view) in panes {
             let controller = NSViewController()
@@ -123,8 +146,24 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         pane.note("In the list: ↑↓ move · Space preview · Return open · ⌘C copy file · ⌘R show in Finder · ⌘⌫ remove · ←→ filter · Esc close")
 
         pane.section("Updates")
-        pane.checkbox("Check for updates automatically", on: host.automaticUpdateChecks, action: #selector(toggleUpdates(_:)))
-        pane.buttons([("Check Now", #selector(checkNow)), ("Show Tutorial", #selector(showTutorial)), ("About Floebin", #selector(showAboutPage))])
+        if let newVersion = host.availableUpdateVersion {
+            pane.note("✨ Floebin \(newVersion) is ready to install.", color: .controlAccentColor)
+            pane.buttons([("Install Update…", #selector(showUpdate)), ("Check Again", #selector(checkNow))])
+        } else {
+            var status = "You have Floebin \(UpdateChecker.currentVersion)."
+            if let last = UpdateChecker.lastCheck {
+                let formatter = RelativeDateTimeFormatter()
+                formatter.unitsStyle = .full
+                status += " Last checked \(formatter.localizedString(for: last, relativeTo: Date()))."
+            }
+            pane.note(status)
+            pane.buttons([("Check Now", #selector(checkNow))])
+        }
+        pane.checkbox("Check for updates automatically", on: host.automaticUpdateChecks, action: #selector(toggleUpdates(_:)),
+                      note: "Floebin looks for a new version about once a day and asks before installing it.")
+
+        pane.section("Help")
+        pane.buttons([("Show Tutorial", #selector(showTutorial))])
 
         return pane.finish()
     }
@@ -199,16 +238,82 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         return pane.finish()
     }
 
+    private func aboutPane() -> NSView {
+        let view = FlippedView(frame: NSRect(x: 0, y: 0, width: paneWidth, height: 420))
+
+        func centered(_ label: NSTextField, y: CGFloat, height: CGFloat) {
+            label.alignment = .center
+            label.frame = NSRect(x: 20, y: y, width: paneWidth - 40, height: height)
+            view.addSubview(label)
+        }
+
+        let icon = NSImageView(frame: NSRect(x: (paneWidth - 84) / 2, y: 22, width: 84, height: 84))
+        icon.image = NSApp.applicationIconImage
+        icon.imageScaling = .scaleProportionallyUpOrDown
+        view.addSubview(icon)
+
+        let info = Bundle.main.infoDictionary
+        let version = info?["CFBundleShortVersionString"] as? String ?? "—"
+        let build = info?["CFBundleVersion"] as? String ?? "—"
+        centered(makeLabel("Floebin", size: 22, weight: .bold, color: .labelColor), y: 112, height: 28)
+        centered(makeLabel("Version \(version) (\(build))", size: 12, weight: .regular, color: .secondaryLabelColor), y: 142, height: 16)
+        centered(makeLabel("Your downloads, one drag away.", size: 12.5, weight: .regular, color: .secondaryLabelColor), y: 162, height: 17)
+
+        let divider = NSBox(frame: NSRect(x: 60, y: 194, width: paneWidth - 120, height: 1))
+        divider.boxType = .separator
+        view.addSubview(divider)
+
+        centered(makeLabel("DESIGNED & BUILT BY", size: 10, weight: .semibold, color: .tertiaryLabelColor), y: 210, height: 13)
+        centered(makeLabel("Shah Emtiaj", size: 17, weight: .semibold, color: .labelColor), y: 226, height: 22)
+
+        let links: [(String, String, String)] = [
+            ("shahemtiaj.com", "globe", "https://shahemtiaj.com"),
+            ("GitHub", "chevron.left.forwardslash.chevron.right", "https://github.com/shahemtiaj"),
+            ("Facebook", "f.square", "https://www.facebook.com/shahemtiaj/"),
+            ("X", "x.square", "https://x.com/shahemtiaj")
+        ]
+        var buttons: [NSButton] = []
+        for (title, symbol, address) in links {
+            let button = NSButton(title: title, target: self, action: #selector(openLink(_:)))
+            button.bezelStyle = .rounded
+            button.image = NSImage(systemSymbolName: symbol, accessibilityDescription: nil)
+            button.imagePosition = .imageLeading
+            button.identifier = NSUserInterfaceItemIdentifier(address)
+            button.toolTip = address
+            button.sizeToFit()
+            buttons.append(button)
+        }
+        let totalWidth = buttons.reduce(CGFloat(0)) { $0 + $1.frame.width } + CGFloat(buttons.count - 1) * 6
+        var x = ((paneWidth - totalWidth) / 2).rounded()
+        for button in buttons {
+            button.frame.origin = NSPoint(x: x, y: 262)
+            view.addSubview(button)
+            x += button.frame.width + 6
+        }
+
+        let project = NSButton(title: "Floebin on GitHub — updates, source and issues", target: self, action: #selector(openLink(_:)))
+        project.bezelStyle = .inline
+        project.identifier = NSUserInterfaceItemIdentifier("https://github.com/\(UpdateChecker.repository)")
+        project.sizeToFit()
+        project.frame.origin = NSPoint(x: ((paneWidth - project.frame.width) / 2).rounded(), y: 306)
+        view.addSubview(project)
+
+        let year = Calendar.current.component(.year, from: Date())
+        centered(makeLabel("© \(year) Shah Emtiaj · Free for everyone", size: 11, weight: .regular, color: .tertiaryLabelColor),
+                 y: 344, height: 15)
+        return view
+    }
+
     // MARK: - Actions
 
-    @objc private func toggleShowButton(_ sender: NSButton) { host?.showFloatingButton = sender.state == .on; rebuild() }
+    @objc private func toggleShowButton(_ sender: NSButton) { host?.showFloatingButton = sender.state == .on; scheduleRebuild() }
     @objc private func toggleMenuBarClick(_ sender: NSButton) { host?.menuBarClickShowsRecent = sender.state == .on }
-    @objc private func toggleLogin(_ sender: NSButton) { host?.launchAtLogin = sender.state == .on; rebuild() }
+    @objc private func toggleLogin(_ sender: NSButton) { host?.launchAtLogin = sender.state == .on; scheduleRebuild() }
     @objc private func toggleUpdates(_ sender: NSButton) { host?.automaticUpdateChecks = sender.state == .on }
-    @objc private func hotKeyChanged(_ sender: NSPopUpButton) { host?.hotKeyPreset = sender.indexOfSelectedItem; rebuild() }
+    @objc private func hotKeyChanged(_ sender: NSPopUpButton) { host?.hotKeyPreset = sender.indexOfSelectedItem; scheduleRebuild() }
     @objc private func checkNow() { host?.checkForUpdatesNow() }
     @objc private func showTutorial() { window?.close(); host?.showTutorial() }
-    @objc private func showAboutPage() { window?.close(); host?.showAbout() }
+    @objc private func showUpdate() { host?.showAvailableUpdate() }
 
     @objc private func sizeChanged(_ sender: NSSegmentedControl) {
         let index = sender.selectedSegment
@@ -235,16 +340,21 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     @objc private func removeFolder(_ sender: NSButton) {
         guard sender.tag >= 0, sender.tag < folderPaths.count else { return }
         host?.removeWatchedFolder(folderPaths[sender.tag])
-        rebuild()
+        scheduleRebuild()
     }
-    @objc private func addFolder() { host?.chooseWatchedFolder(); rebuild(); window?.makeKeyAndOrderFront(nil) }
-    @objc private func addDesktop() { host?.addWatchedFolder(NSHomeDirectory() + "/Desktop"); rebuild() }
-    @objc private func addScreenshots() { host?.addWatchedFolder(Self.screenshotsFolder()); rebuild() }
-    @objc private func chooseProject() { host?.chooseProjectFolder(); rebuild(); window?.makeKeyAndOrderFront(nil) }
-    @objc private func clearProject() { host?.clearProjectFolder(); rebuild() }
+    @objc private func addFolder() { host?.chooseWatchedFolder(); scheduleRebuild(); window?.makeKeyAndOrderFront(nil) }
+    @objc private func addDesktop() { host?.addWatchedFolder(NSHomeDirectory() + "/Desktop"); scheduleRebuild() }
+    @objc private func addScreenshots() { host?.addWatchedFolder(Self.screenshotsFolder()); scheduleRebuild() }
+    @objc private func chooseProject() { host?.chooseProjectFolder(); scheduleRebuild(); window?.makeKeyAndOrderFront(nil) }
+    @objc private func clearProject() { host?.clearProjectFolder(); scheduleRebuild() }
     @objc private func toggleSort(_ sender: NSButton) { host?.sortIntoTypeFolders = sender.state == .on }
     @objc private func toggleAutoSend(_ sender: NSButton) { host?.autoSendToProject = sender.state == .on }
-    @objc private func chooseLUT() { host?.chooseLUTFolder(); rebuild(); window?.makeKeyAndOrderFront(nil) }
+    @objc private func chooseLUT() { host?.chooseLUTFolder(); scheduleRebuild(); window?.makeKeyAndOrderFront(nil) }
+    @objc private func openLink(_ sender: NSButton) {
+        if let address = sender.identifier?.rawValue, let url = URL(string: address) {
+            NSWorkspace.shared.open(url)
+        }
+    }
 
     // MARK: - Helpers
 

@@ -217,7 +217,7 @@ final class PillButton: NSView {
         didSet { updateBackground() }
     }
 
-    init(title: String?, symbol: String?, style: Style = .normal, height: CGFloat = 28) {
+    init(title: String?, symbol: String?, style: Style = .normal, height: CGFloat = 28, padding: CGFloat = 12) {
         self.style = style
         self.titleText = title
 
@@ -226,7 +226,6 @@ final class PillButton: NSView {
         let iconColor: NSColor = style == .prominent ? .white : .secondaryLabelColor
         let iconSize: CGFloat = 16
         let gap: CGFloat = 5
-        let padding: CGFloat = 12
 
         var icon: NSImageView?
         if let symbol, let image = NSImage(systemSymbolName: symbol, accessibilityDescription: title ?? symbol)?

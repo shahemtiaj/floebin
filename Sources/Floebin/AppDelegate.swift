@@ -57,6 +57,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var watchers: [DownloadWatcher] = []
     private var settingsWindow: SettingsWindowController!
     private var updater: UpdateChecker!
+    private var updatePopup: UpdatePopupController!
+    private var availableUpdate: UpdateInfo?
+    /// "Clear" date, cached (it's checked for every file whenever the list is rebuilt).
+    private var clearedAt: Date?
     private var hotKeyOK = true
     private var pinnedList: [String] = []
     private var recent: [URL] = []
@@ -95,6 +99,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         hiddenList = UserDefaults.standard.stringArray(forKey: hiddenKey) ?? []
         hiddenSet = Set(hiddenList)
         pinnedList = UserDefaults.standard.stringArray(forKey: pinnedKey) ?? []
+        clearedAt = UserDefaults.standard.object(forKey: clearedKey) as? Date
 
         setupActions()
         setupPanel()
@@ -107,10 +112,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         settingsWindow = SettingsWindowController()
         settingsWindow.host = self
 
+        updatePopup = UpdatePopupController()
         updater = UpdateChecker()
         updater.beforeAlert = { [weak self] in
             self?.list.hide()
             self?.tutorial.hide()
+        }
+        updater.onUpdateAvailable = { [weak self] info in
+            self?.updateFound(info)
+        }
+        updater.onChecked = { [weak self] in
+            self?.settingsWindow?.refreshIfOpen()
+        }
+        updatePopup.onSkip = { [weak self] version in
+            self?.updater.skip(version)
+            self?.availableUpdate = nil
+            self?.setStatusBadge(false)
+            self?.settingsWindow?.refreshIfOpen()
         }
 
         HotKeyCenter.action = { [weak self] in
@@ -118,10 +136,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         registerHotKey()
 
-        // Quiet daily update check, a little after launch
-        DispatchQueue.main.asyncAfter(deadline: .now() + 8) { [weak self] in
-            MainActor.assumeIsolated { self?.updater.checkIfDue() }
-        }
+        // Quiet daily update check (shortly after launch, then every few hours if due)
+        updater.startAutomaticChecks()
 
         NotificationCenter.default.addObserver(
             self,
@@ -252,6 +268,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         actions.onProjectChanged = { [weak self] in
             guard let self else { return }
             self.list.refresh(files: self.recent, anchor: self.panel.frame)
+            self.settingsWindow?.refreshIfOpen()
         }
         actions.beforeModal = { [weak self] in
             self?.list.hide()
@@ -490,6 +507,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let locked = !UserDefaults.standard.bool(forKey: lockKey)
         UserDefaults.standard.set(locked, forKey: lockKey)
         button.allowsMoving = !locked
+        settingsWindow?.refreshIfOpen()
     }
 
     @objc private func changeSize(_ sender: NSMenuItem) {
@@ -507,6 +525,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         installButton()
         finishMove(panel.frame.origin)
         button.pulse()
+        settingsWindow?.refreshIfOpen()
     }
 
     @objc private func screensChanged() {
@@ -589,6 +608,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     @objc private func toggleAudioPreview() {
         UserDefaults.standard.set(!UserDefaults.standard.bool(forKey: playAudioKey), forKey: playAudioKey)
+        settingsWindow?.refreshIfOpen()
     }
 
     @objc private func changeRecentCount(_ sender: NSMenuItem) {
@@ -606,6 +626,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             button.fileURL = recent.first
         }
         list.refresh(files: recent, anchor: panel.frame)
+        settingsWindow?.refreshIfOpen()
     }
 
     // MARK: - Downloads
@@ -663,6 +684,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         startWatching()
         recent = mergedRecent()
         list.refresh(files: recent, anchor: panel.frame)
+        settingsWindow?.refreshIfOpen()
     }
 
     private func handleNewFile(_ newFile: URL) {
@@ -699,6 +721,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         UserDefaults.standard.set(hiddenList, forKey: hiddenKey)
 
+        // Removing a pinned file unpins it too.
+        let pinCount = pinnedList.count
+        pinnedList.removeAll { paths.contains($0) }
+        if pinnedList.count != pinCount {
+            UserDefaults.standard.set(pinnedList, forKey: pinnedKey)
+        }
+
         recent = mergedRecent()   // the next-newest file moves up into the list
         if let current = button.fileURL, paths.contains(current.path) {
             button.fileURL = recent.first
@@ -713,6 +742,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if let index = recent.firstIndex(where: { $0.path == old.path }) {
             recent[index] = new
         }
+        if let pinIndex = pinnedList.firstIndex(of: old.path) {
+            pinnedList[pinIndex] = new.path
+            UserDefaults.standard.set(pinnedList, forKey: pinnedKey)
+        }
         if button.fileURL?.path == old.path {
             button.fileURL = new
         }
@@ -721,7 +754,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     private func clearRecent() {
         // Everything downloaded up to now stays out of the list, even after a restart.
-        UserDefaults.standard.set(Date(), forKey: clearedKey)
+        let now = Date()
+        UserDefaults.standard.set(now, forKey: clearedKey)
+        clearedAt = now
         recent.removeAll()
         button.fileURL = nil
         hasFreshFile = false
@@ -781,15 +816,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 merged.append(url)
             }
         }
-        merged.sort { (FileDates.added($0) ?? .distantPast) > (FileDates.added($1) ?? .distantPast) }
-        return Array(merged.prefix(maxRecent))
+        let dated = merged.map { (url: $0, date: FileDates.added($0) ?? .distantPast) }
+        return dated.sorted { $0.date > $1.date }.prefix(maxRecent).map { $0.url }
     }
 
     private func isHidden(_ url: URL) -> Bool {
         if hiddenSet.contains(url.path) {
             return true
         }
-        if let cleared = UserDefaults.standard.object(forKey: clearedKey) as? Date,
+        if let cleared = clearedAt,
            let added = FileDates.added(url), added <= cleared {
             return true
         }
@@ -905,10 +940,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     @objc private func toggleStatusClick() {
         UserDefaults.standard.set(!statusClickShowsRecent, forKey: statusClickKey)
         applyStatusMode()
+        settingsWindow?.refreshIfOpen()
     }
 
     func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
+        if let update = availableUpdate {
+            let entry = item("Update to Floebin \(update.version)…", #selector(showAvailableUpdate), symbol: "arrow.down.app")
+            entry.attributedTitle = NSAttributedString(
+                string: "Update to Floebin \(update.version)…",
+                attributes: [.font: NSFont.systemFont(ofSize: NSFont.systemFontSize, weight: .semibold), .foregroundColor: NSColor.controlAccentColor])
+            menu.addItem(entry)
+            menu.addItem(.separator())
+        }
         menu.addItem(item("About Floebin", #selector(showAbout), symbol: "info.circle"))
         menu.addItem(.separator())
         menu.addItem(item(isButtonShown ? "Hide Floating Button" : "Show Floating Button", #selector(toggleVisible)))
@@ -939,6 +983,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         } else {
             panel.orderOut(nil)
         }
+        settingsWindow?.refreshIfOpen()
     }
 
     @objc private func toggleLaunchAtLogin() {
@@ -955,6 +1000,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             alert.informativeText = "Move Floebin.app into your Applications folder and try again.\n\n\(error.localizedDescription)"
             alert.runModal()
         }
+        settingsWindow?.refreshIfOpen()
     }
 
     @objc private func openSettings() {
@@ -966,6 +1012,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     @objc private func checkForUpdatesFromMenu() {
         updater.check(userInitiated: true)
+    }
+
+    // MARK: - Updates
+
+    private func updateFound(_ info: UpdateInfo) {
+        availableUpdate = info
+        setStatusBadge(true)
+        list.hide()
+        tutorial.hide()
+        about.hide()
+        updatePopup.show(info, near: cardAnchor)
+        settingsWindow?.refreshIfOpen()
+    }
+
+    @objc func showAvailableUpdate() {
+        guard let info = availableUpdate else { return }
+        list.hide()
+        updatePopup.show(info, near: cardAnchor)
     }
 
     @objc private func openDownloadsFolder() {
@@ -1131,6 +1195,12 @@ extension AppDelegate: SettingsHost {
 
     func checkForUpdatesNow() {
         updater.check(userInitiated: true)
+    }
+
+    var availableUpdateVersion: String? {
+        guard let update = availableUpdate,
+              UpdateChecker.isVersion(update.version, newerThan: UpdateChecker.currentVersion) else { return nil }
+        return update.version
     }
 }
 
