@@ -130,6 +130,9 @@ Floebin checks about once a day while it's running. You can also check any time 
 
 1. Download **Floebin-x.y.z.dmg** from the [latest release](https://github.com/shahemtiaj/floebin/releases/latest).
 2. Open it and drag **Floebin** into **Applications**.
+
+   <img src="docs/screenshots/install-drag.png" alt="The Floebin DMG window: drag Floebin onto the Applications folder" width="620">
+
 3. Open Floebin. The first time, macOS blocks it. See [**Opening Floebin the first time**](#opening-floebin-the-first-time) below; it takes about 20 seconds and only happens once.
 4. Click **Allow** when macOS asks for access to your Downloads folder.
 5. Optional: menu bar icon → **Launch at Login**.
@@ -138,20 +141,28 @@ After that, updates install from inside Floebin (**Install & Restart**) and don'
 
 ## Opening Floebin the first time
 
-The first time you open Floebin, macOS shows:
+The first time you open Floebin, macOS shows this:
 
-> **“Floebin” Not Opened**: Apple could not verify “Floebin” is free of malware that may harm your Mac or compromise your privacy.
+<p align="center">
+  <img src="docs/screenshots/first-launch-1-warning.png" alt="macOS warning: “Floebin” Not Opened. Apple could not verify “Floebin” is free of malware. Buttons: Move to Trash, Done." width="330">
+</p>
 
 **This doesn't mean anything is wrong with Floebin.** macOS shows this for every app that isn't *notarized*, meaning registered with Apple through the paid Apple Developer Program (99 USD a year). Floebin is free, and all of its code is public in this repository for anyone to read. Click **Done** (not *Move to Trash*), then use either option below.
 
 ### Option 1: System Settings (no Terminal)
 
-1. Try to open Floebin once and click **Done** on the warning.
-2. Open **System Settings → Privacy & Security** and scroll down to the **Security** section.
-3. Next to *“Floebin” was blocked to protect your Mac*, click **Open Anyway**. (The button stays there for about an hour after you try to open the app.)
-4. Click **Open Anyway** again and enter your Mac password.
+1. Try to open Floebin once and click **Done** on the warning (picture above, ①).
+2. Open **System Settings** (Apple menu  → System Settings) and click **Privacy & Security** in the sidebar (②).
+3. Scroll down to the **Security** section (③). Right under *Allow applications from* you'll see *“Floebin” was blocked to protect your Mac.* Click **Open Anyway**.
+4. A final dialog appears: click **Open Anyway** again and enter your Mac password (or use Touch ID).
 
-Floebin opens, and macOS remembers your choice.
+<p align="center">
+  <img src="docs/screenshots/first-launch-2-open-anyway.png" alt="System Settings → Privacy & Security, scrolled to the Security section, where the “Floebin” was blocked message and the Open Anyway button appear" width="620">
+</p>
+
+Floebin opens, and macOS remembers your choice. You never have to do this again for this copy, and updates installed from inside Floebin don't trigger it.
+
+> **Don't see the Open Anyway button?** It only appears for about an hour after macOS blocks an app. Open Floebin once more, click **Done**, and check again. If it still isn't there, use Option 2.
 
 ### Option 2: Terminal (one line)
 
