@@ -130,9 +130,44 @@ Floebin checks about once a day while it's running. You can also check any time 
 
 1. Download **Floebin-x.y.z.dmg** from the [latest release](https://github.com/shahemtiaj/floebin/releases/latest).
 2. Open it and drag **Floebin** into **Applications**.
-3. First launch: **right-click Floebin → Open → Open**. Floebin isn't notarized by Apple yet, so macOS asks once.
+3. Open Floebin. The first time, macOS blocks it. See [**Opening Floebin the first time**](#opening-floebin-the-first-time) below; it takes about 20 seconds and only happens once.
 4. Click **Allow** when macOS asks for access to your Downloads folder.
 5. Optional: menu bar icon → **Launch at Login**.
+
+After that, updates install from inside Floebin (**Install & Restart**) and don't show this warning again.
+
+## Opening Floebin the first time
+
+The first time you open Floebin, macOS shows:
+
+> **“Floebin” Not Opened**: Apple could not verify “Floebin” is free of malware that may harm your Mac or compromise your privacy.
+
+**This doesn't mean anything is wrong with Floebin.** macOS shows this for every app that isn't *notarized*, meaning registered with Apple through the paid Apple Developer Program (99 USD a year). Floebin is free, and all of its code is public in this repository for anyone to read. Click **Done** (not *Move to Trash*), then use either option below.
+
+### Option 1: System Settings (no Terminal)
+
+1. Try to open Floebin once and click **Done** on the warning.
+2. Open **System Settings → Privacy & Security** and scroll down to the **Security** section.
+3. Next to *“Floebin” was blocked to protect your Mac*, click **Open Anyway**. (The button stays there for about an hour after you try to open the app.)
+4. Click **Open Anyway** again and enter your Mac password.
+
+Floebin opens, and macOS remembers your choice.
+
+### Option 2: Terminal (one line)
+
+Paste this into **Terminal** and press Return, then open Floebin normally:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/Floebin.app
+```
+
+This removes the "downloaded from the internet" tag from Floebin only, so macOS stops asking. It doesn't change any security setting for other apps.
+
+> On macOS 14 Sonoma and earlier you can also **right-click Floebin → Open → Open**. macOS 15 Sequoia and later removed that shortcut, which is why the steps above are needed.
+
+### Why not just remove the warning?
+
+There's no free way to do that. The warning only disappears for everyone when the app is signed with an Apple **Developer ID** and **notarized**, and that requires the paid Apple Developer Program. Floebin is ready for it: once a Developer ID is set up, `release.sh` signs, notarizes and staples the app and DMG automatically, and the warning goes away. Until then, Floebin stays free and you allow it once with the steps above.
 
 ## Build from source
 

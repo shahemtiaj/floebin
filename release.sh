@@ -9,8 +9,8 @@
 #        xcrun notarytool store-credentials floebin-notary \
 #          --apple-id "you@example.com" --team-id "YOURTEAMID" --password "app-specific-password"
 #
-# Without one, you still get a DMG — people open it the first time with right-click → Open
-# (see README → Install).
+# Without one, you still get a DMG. macOS blocks it the first time; people allow it once via
+# System Settings → Privacy & Security → Open Anyway (see README → Opening Floebin the first time).
 #
 # Then publish: GitHub → shahemtiaj/floebin → Releases → tag vX.Y.Z → attach the DMG.
 # Every copy of Floebin sees it through Settings → General → Check for updates.
@@ -53,6 +53,7 @@ if [ -n "$DEVID" ]; then
 else
   echo ""
   echo "✓ $DMG is ready (not notarized — no Developer ID on this Mac)."
-  echo "  On another Mac, open it the first time with right-click → Open."
+  echo "  On another Mac: open it once, then System Settings → Privacy & Security → Open Anyway."
+  echo "  (README → Opening Floebin the first time)"
 fi
 echo "  Publish it: GitHub → shahemtiaj/floebin → Releases → tag v$VERSION → attach the DMG."
