@@ -14,6 +14,7 @@
   <img src="https://img.shields.io/badge/macOS-13%2B-black?logo=apple" alt="macOS 13 or later">
   <img src="https://img.shields.io/badge/Swift-5.9-F05138?logo=swift&logoColor=white" alt="Swift 5.9">
   <img src="https://img.shields.io/badge/price-free-2ea44f" alt="Free">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT License"></a>
   <a href="https://github.com/shahemtiaj/floebin/releases"><img src="https://img.shields.io/github/downloads/shahemtiaj/floebin/total?color=8957e5" alt="Downloads"></a>
 </p>
 
@@ -155,7 +156,7 @@ The first time you open Floebin, macOS shows this:
   <img src="docs/screenshots/first-launch-1-warning.png" alt="macOS warning: “Floebin” Not Opened. Apple could not verify “Floebin” is free of malware. Buttons: Move to Trash, Done." width="330">
 </p>
 
-**This doesn't mean anything is wrong with Floebin.** macOS shows this for every app that isn't *notarized*, meaning registered with Apple through the paid Apple Developer Program (99 USD a year). Floebin is free, and all of its code is public in this repository for anyone to read. Click **Done** (not *Move to Trash*), then use either option below.
+**This doesn't mean anything is wrong with Floebin.** macOS shows this for every app that isn't *notarized*, meaning registered with Apple through the paid Apple Developer Program (99 USD a year). Floebin is free and open source (MIT License), and all of its code is public in this repository for anyone to read. Click **Done** (not *Move to Trash*), then use either option below.
 
 ### Option 1: System Settings (no Terminal)
 
@@ -262,3 +263,10 @@ Floebin is designed and built by **Shah Emtiaj**.
 - GitHub: [github.com/shahemtiaj](https://github.com/shahemtiaj)
 - Facebook: [facebook.com/shahemtiaj](https://www.facebook.com/shahemtiaj/)
 - X: [x.com/shahemtiaj](https://x.com/shahemtiaj)
+
+## License
+
+Floebin is open source under the [MIT License](LICENSE). You're free to use, copy, modify and share it, including in commercial work, as long as you keep the copyright notice and license text. It comes as is, without any warranty.
+
+The Floebin name and app icon identify this project. If you publish your own version, please give it a different name and icon.
+

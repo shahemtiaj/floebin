@@ -2,6 +2,10 @@
 
 Every version of Floebin is published on [GitHub Releases](https://github.com/shahemtiaj/floebin/releases) with a DMG. Installed copies find new versions through **Settings → General → Check Now** (or automatically, about once a day) and install them with **Install & Restart**.
 
+## Unreleased
+
+- Floebin is now open source under the MIT License.
+
 ## 1.0.0 (2026-11-20)
 
 ### New
